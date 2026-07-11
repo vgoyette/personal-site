@@ -1,0 +1,25 @@
+- content_for :title, "#{@project.title} — Admin"
+
+header class="flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between"
+  div
+    p class="font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+      = link_to "← Projects", admin_projects_path, class: "transition hover:text-accent"
+    h1 class="mt-4 font-display text-3xl font-medium tracking-tight text-ink"
+      = @project.title
+    p class="mt-2 font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+      span[class=(@project.published? ? "text-accent" : "text-ink-muted")]
+        = @project.published? ? "Published" : "Draft"
+      | · #{@project.slug}
+      - if @project.published_at
+        | · #{l(@project.published_at, format: :long)}
+  div class="flex items-center gap-4 font-mono text-xs uppercase tracking-[0.22em]"
+    = link_to "Edit", edit_admin_project_path(@project), class: "text-ink-muted transition hover:text-accent"
+    - if @project.published?
+      = link_to "View ↗", project_path(@project), class: "text-ink-muted transition hover:text-accent", target: "_blank", rel: "noopener"
+
+- if @project.summary.present?
+  p class="mt-10 font-sans text-lg leading-relaxed text-ink-muted"
+    = @project.summary
+
+div class="mt-10"
+  = render Content::MarkdownComponent.new(body: @project.body_markdown)

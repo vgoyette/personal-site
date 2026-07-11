@@ -1,0 +1,36 @@
+= form_with model: [:admin, project], local: true, class: "space-y-6" do |f|
+  - if project.errors.any?
+    div class="rounded border border-red-500/60 bg-red-500/5 p-4"
+      p class="font-mono text-xs uppercase tracking-[0.22em] text-red-500"
+        = pluralize(project.errors.count, "error") + " prevented saving:"
+      ul class="mt-2 list-disc pl-5 font-sans text-sm text-red-500"
+        - project.errors.full_messages.each do |msg|
+          li = msg
+
+  div
+    = f.label :title, class: "block font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+    = f.text_field :title, required: true, class: "mt-2 w-full rounded border border-line bg-transparent px-3 py-2 font-sans text-base text-ink focus:border-accent focus:outline-none"
+
+  div
+    = f.label :slug, class: "block font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+    = f.text_field :slug, placeholder: "auto from title", class: "mt-2 w-full rounded border border-line bg-transparent px-3 py-2 font-mono text-sm text-ink focus:border-accent focus:outline-none"
+
+  div
+    = f.label :summary, class: "block font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+    = f.text_area :summary, rows: 3, class: "mt-2 w-full rounded border border-line bg-transparent px-3 py-2 font-sans text-base text-ink focus:border-accent focus:outline-none"
+
+  div
+    = f.label :body_markdown, "Body (Markdown)", class: "block font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+    = f.text_area :body_markdown, rows: 18, required: true, class: "mt-2 w-full rounded border border-line bg-transparent px-3 py-2 font-mono text-sm leading-relaxed text-ink focus:border-accent focus:outline-none"
+
+  div
+    = f.label :url, "External URL (optional)", class: "block font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+    = f.url_field :url, class: "mt-2 w-full rounded border border-line bg-transparent px-3 py-2 font-sans text-base text-ink focus:border-accent focus:outline-none"
+
+  div
+    = f.label :published_at, "Published at (blank = draft)", class: "block font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+    = f.datetime_local_field :published_at, class: "mt-2 w-full rounded border border-line bg-transparent px-3 py-2 font-mono text-sm text-ink focus:border-accent focus:outline-none"
+
+  div class="flex items-center gap-4 pt-2"
+    = f.submit class: "cursor-pointer rounded-full bg-accent px-6 py-2 font-mono text-xs uppercase tracking-[0.22em] text-white transition hover:brightness-110 dark:text-zinc-950"
+    = link_to "Cancel", admin_projects_path, class: "font-mono text-xs uppercase tracking-[0.22em] text-ink-muted transition hover:text-accent"

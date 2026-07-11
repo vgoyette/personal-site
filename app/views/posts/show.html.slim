@@ -1,0 +1,22 @@
+- content_for :title, "#{@post.title} — Vincent"
+
+div class="relative isolate min-h-dvh bg-canvas text-ink"
+  = render Site::NavComponent.new(current: "writing")
+
+  article class="relative px-6 pb-24 pt-16 sm:px-10 lg:px-16"
+    div class="mx-auto w-full max-w-3xl"
+      p class="font-mono text-xs uppercase tracking-[0.28em] text-ink-muted"
+        = link_to "← All writing", posts_path, class: "transition hover:text-accent"
+
+      header class="mt-10"
+        h1 class="font-display text-4xl font-medium leading-tight tracking-tight text-ink sm:text-5xl"
+          = @post.title
+        - if @post.published_at
+          time datetime=@post.published_at.iso8601 class="mt-4 block font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+            = @post.published_at.strftime("%b %-d, %Y")
+        - if @post.summary.present?
+          p class="mt-6 font-sans text-lg leading-relaxed text-ink-muted"
+            = @post.summary
+
+      div class="mt-12"
+        = render Content::MarkdownComponent.new(body: @post.body_markdown)

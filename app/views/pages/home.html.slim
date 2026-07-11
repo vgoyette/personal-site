@@ -1,0 +1,12 @@
+- content_for :title, "Vincent"
+
+div class="relative isolate min-h-dvh overflow-hidden bg-canvas text-ink"
+  = render Home::AtmosphereComponent.new
+  = render Home::HeroComponent.new( \
+      brand: "Vincent", \
+      headline: "Building systems that remember why.", \
+      lede: "A thin personal site for work, notes, and experiments — kept light on purpose.", \
+      primary_cta: { href: "mailto:vgoyette22@gmail.com", label: "Say hello" }, \
+      secondary_cta: { href: "#footer", label: "Contact" })
+  #footer
+    = render Site::FooterComponent.new(email: "vgoyette22@gmail.com")

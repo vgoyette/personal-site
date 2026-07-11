@@ -1,0 +1,31 @@
+section[
+  data-controller="reveal"
+  class="relative flex min-h-dvh flex-col justify-center px-6 py-24 sm:px-10 lg:px-16"
+]
+  div class="relative z-10 mx-auto w-full max-w-5xl"
+    p[
+      data-reveal-target="item"
+      style="animation-delay: 40ms"
+      class="font-mono text-xs uppercase tracking-[0.28em] text-ink-muted motion-safe:animate-rise"
+    ]
+      = brand
+    h1[
+      data-reveal-target="item"
+      style="animation-delay: 120ms"
+      class="mt-6 max-w-4xl font-display text-5xl font-medium leading-[0.95] tracking-tight text-ink sm:text-6xl lg:text-7xl motion-safe:animate-rise"
+    ]
+      = headline
+    p[
+      data-reveal-target="item"
+      style="animation-delay: 200ms"
+      class="mt-8 max-w-xl font-sans text-lg leading-relaxed text-ink-muted sm:text-xl motion-safe:animate-rise"
+    ]
+      = lede
+    div[
+      data-reveal-target="item"
+      style="animation-delay: 280ms"
+      class="mt-10 flex flex-wrap items-center gap-4 motion-safe:animate-rise"
+    ]
+      = render Ui::ButtonComponent.new(href: primary_cta.fetch(:href), label: primary_cta.fetch(:label))
+      - if secondary_cta
+        = render Ui::ButtonComponent.new(href: secondary_cta.fetch(:href), label: secondary_cta.fetch(:label), variant: :secondary)

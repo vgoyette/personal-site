@@ -1,1 +1,103 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-surface: var(--surface);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-line: var(--line);
+  --color-orb-a: var(--orb-a);
+  --color-orb-b: var(--orb-b);
+  --color-orb-c: var(--orb-c);
+
+  --animate-drift-a: drift-a 18s ease-in-out infinite;
+  --animate-drift-b: drift-b 22s ease-in-out infinite;
+  --animate-drift-c: drift-c 26s ease-in-out infinite;
+  --animate-rise: rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+:root {
+  --canvas: #fafafa;
+  --ink: #09090b;
+  --ink-muted: #3f3f46;
+  --surface: #ffffff;
+  --accent: #2563eb;
+  --accent-soft: color-mix(in oklab, #2563eb 14%, transparent);
+  --line: #e4e4e7;
+  --orb-a: color-mix(in oklab, #2563eb 28%, transparent);
+  --orb-b: color-mix(in oklab, #0ea5e9 22%, transparent);
+  --orb-c: color-mix(in oklab, #64748b 18%, transparent);
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: #0a0a0c;
+  --ink: #ededef;
+  --ink-muted: #a1a1aa;
+  --surface: #121214;
+  --accent: #60a5fa;
+  --accent-soft: color-mix(in oklab, #60a5fa 18%, transparent);
+  --line: color-mix(in oklab, #ffffff 10%, transparent);
+  --orb-a: color-mix(in oklab, #3b82f6 32%, transparent);
+  --orb-b: color-mix(in oklab, #38bdf8 20%, transparent);
+  --orb-c: color-mix(in oklab, #94a3b8 14%, transparent);
+  color-scheme: dark;
+}
+
+@keyframes drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(6%, -4%, 0) scale(1.08);
+  }
+}
+
+@keyframes drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(-8%, 5%, 0) scale(1);
+  }
+}
+
+@keyframes drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(4%, 8%, 0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe\:animate-drift-a,
+  .motion-safe\:animate-drift-b,
+  .motion-safe\:animate-drift-c,
+  .motion-safe\:animate-rise {
+    animation: none !important;
+  }
+}

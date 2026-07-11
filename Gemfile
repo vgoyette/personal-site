@@ -29,10 +29,14 @@ gem "dry-initializer"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
-gem "solid_cache"
-gem "solid_queue"
-gem "solid_cable"
+# Solid Cache/Queue/Cable are removed for v1: single primary Postgres,
+# no background jobs or Action Cable yet. Re-add when [[Q-solid-stack-in-prod]]
+# is resolved. Rails 8 eagerly loads these gems' models in production, which
+# crashes if their sub-DBs aren't wired — hence full removal, not just
+# stripped config.
+# gem "solid_cache"
+# gem "solid_queue"
+# gem "solid_cable"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
@@ -63,3 +67,5 @@ group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
 end
+
+gem "dockerfile-rails", ">= 1.7", group: :development

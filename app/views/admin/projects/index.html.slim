@@ -1,0 +1,24 @@
+- content_for :title, "Projects — Admin"
+
+header class="flex flex-col gap-4 sm:flex-row sm:items-baseline sm:justify-between"
+  h1 class="font-display text-3xl font-medium tracking-tight text-ink"
+    | Projects
+  = link_to "New project", new_admin_project_path, class: "inline-flex items-center rounded-full bg-accent px-4 py-2 font-mono text-xs uppercase tracking-[0.22em] text-white transition hover:brightness-110 dark:text-zinc-950"
+
+- if @projects.any?
+  ul class="mt-10 divide-y divide-line/60"
+    - @projects.each do |project|
+      li class="flex flex-col gap-2 py-5 sm:flex-row sm:items-baseline sm:justify-between"
+        div
+          h2 class="font-display text-xl font-medium text-ink"
+            = link_to project.title, admin_project_path(project), class: "transition hover:text-accent"
+          p class="mt-1 font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+            span[class=(project.published? ? "text-accent" : "text-ink-muted")]
+              = project.published? ? "Published" : "Draft"
+            | · #{project.slug}
+        div class="flex items-center gap-4 font-mono text-xs uppercase tracking-[0.22em]"
+          = link_to "Edit", edit_admin_project_path(project), class: "text-ink-muted transition hover:text-accent"
+          = button_to "Delete", admin_project_path(project), method: :delete, form: { data: { turbo_confirm: "Delete #{project.title}?" } }, class: "cursor-pointer border-none bg-transparent text-ink-muted transition hover:text-red-500"
+- else
+  p class="mt-10 font-sans text-base text-ink-muted"
+    | No projects yet.

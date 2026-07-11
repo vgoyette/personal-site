@@ -1,0 +1,10 @@
+- content_for :title, "Edit #{@project.title} — Admin"
+
+header
+  p class="font-mono text-xs uppercase tracking-[0.22em] text-ink-muted"
+    = link_to "← Projects", admin_projects_path, class: "transition hover:text-accent"
+  h1 class="mt-4 font-display text-3xl font-medium tracking-tight text-ink"
+    | Edit #{@project.title}
+
+div class="mt-8 max-w-2xl"
+  = render "form", project: @project

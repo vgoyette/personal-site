@@ -18,6 +18,9 @@ chosen lives in `personal-site-brain` (ADR-004 fly-github-actions, plan
 | Master key secret | `RAILS_MASTER_KEY` (Fly secret)              |
 | DB secret         | `DATABASE_URL` (set by `fly postgres attach`)|
 | CI deploy token   | GitHub repo secret `FLY_API_TOKEN`           |
+| Admin credentials | Fly secrets `ADMIN_USERNAME` / `ADMIN_PASSWORD` (see below) |
+| GitHub repo       | **public** `vgoyette/personal-site`          |
+| `main` protection | PRs required; checks `scan_ruby`, `scan_js`, `lint`, `test` |
 
 Machines are configured with `auto_stop_machines = "stop"` and
 `min_machines_running = 0`, so the app sleeps when idle. First request
@@ -89,3 +92,34 @@ If a deploy job fails but CI was green, most-common causes:
    `fly tokens create deploy` and update the GitHub Environment secret.
 2. Migration in `release_command` failed → check `fly logs` and roll back.
 3. Health check failing on `/up` → boot error; check `fly logs` for the trace.
+
+## Admin (HTTP Basic)
+
+`/admin/projects` and `/admin/posts` are gated by HTTP Basic Auth. Credentials
+come from `ADMIN_USERNAME` / `ADMIN_PASSWORD`. When either env var is unset the
+admin returns 401 for **every** request — there is no blank-credential
+fallback.
+
+Local dev:
+
+```bash
+ADMIN_USERNAME=vincent ADMIN_PASSWORD=$(openssl rand -base64 24) bin/rails s
+```
+
+Production (Fly):
+
+```bash
+fly secrets set \
+  ADMIN_USERNAME=vincent \
+  ADMIN_PASSWORD="$(openssl rand -base64 24)" \
+  --app vgoyette
+# triggers a redeploy; note the password value before running — Fly never
+# reveals it again. Store it in your password manager.
+```
+
+Bootstrap / seed content without touching the browser admin:
+
+```bash
+fly ssh console -a vgoyette -C "bin/rails db:seed"
+fly ssh console -a vgoyette -C "bin/rails console"
+```

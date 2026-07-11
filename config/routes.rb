@@ -7,5 +7,14 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  resources :projects, only: %i[index show], param: :slug
+  resources :posts, only: %i[index show], path: "writing", param: :slug
+
+  namespace :admin do
+    root to: redirect("/admin/projects")
+    resources :projects
+    resources :posts
+  end
+
   root "pages#home"
 end

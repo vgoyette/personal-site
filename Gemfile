@@ -23,6 +23,9 @@ gem "view_component"
 gem "dry-types"
 gem "dry-initializer"
 
+# Markdown rendering for portable content bodies (Projects, Posts)
+gem "commonmarker"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 

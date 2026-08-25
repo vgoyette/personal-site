@@ -48,7 +48,12 @@ gem "bootsnap", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
+# activestorage 8.1.3.1 (security release) eager-loads ImageProcessing::Vips at
+# boot, which requires ruby-vips at load time. libvips is already installed in
+# the Dockerfile and is provisioned in CI (see .github/workflows/ci.yml). v1
+# has no attachments — kept for the Rails-generator default per ADR-003.
 gem "image_processing", "~> 2.0"
+gem "ruby-vips", "~> 2.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

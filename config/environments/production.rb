@@ -55,8 +55,13 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
-  # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  # Set host to be used by links generated in mailer templates. Falls back to
+  # the Fly hostname when SITE_HOST is unset so no `example.com` links leak
+  # into production email should we ever start sending it.
+  config.action_mailer.default_url_options = {
+    host: ENV.fetch("SITE_HOST", "vgoyette.fly.dev"),
+    protocol: "https"
+  }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
   # config.action_mailer.smtp_settings = {
@@ -77,12 +82,21 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
-  # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # DNS rebinding / Host header protection. Enabled only when SITE_HOST is set,
+  # so the pre-custom-domain deploy keeps working on `*.fly.dev` unchanged.
+  # See personal-site-brain plans/2026-08-24-custom-domain and Q-custom-domain.
+  if (site_host = ENV["SITE_HOST"]).present?
+    config.hosts = [
+      site_host,
+      "www.#{site_host}",
+      "vgoyette.fly.dev"
+    ]
+
+    # Fly's platform health checks hit `/up` with the machine's internal host
+    # header, which will not match the allowlist above. Excluding it keeps
+    # deploys from flapping.
+    config.host_authorization = {
+      exclude: ->(request) { request.path == "/up" }
+    }
+  end
 end

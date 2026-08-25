@@ -31,6 +31,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
+      # `bin/importmap audit` boots Rails via config/application, which triggers
+      # activestorage's eager load of ImageProcessing::Vips (see the test job
+      # for the same one-liner).
+      - name: Install libvips
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libvips
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:

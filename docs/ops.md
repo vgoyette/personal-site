@@ -19,6 +19,7 @@ chosen lives in `personal-site-brain` (ADR-004 fly-github-actions, plan
 | DB secret         | `DATABASE_URL` (set by `fly postgres attach`)|
 | CI deploy token   | GitHub repo secret `FLY_API_TOKEN`           |
 | Admin credentials | Fly secrets `ADMIN_USERNAME` / `ADMIN_PASSWORD` (see below) |
+| Custom domain     | Fly secret `SITE_HOST` (apex hostname; unset = fly.dev only) |
 | GitHub repo       | **public** `vgoyette/personal-site`          |
 | `main` protection | PRs required; checks `scan_ruby`, `scan_js`, `lint`, `test` |
 
@@ -123,3 +124,58 @@ Bootstrap / seed content without touching the browser admin:
 fly ssh console -a vgoyette -C "bin/rails db:seed"
 fly ssh console -a vgoyette -C "bin/rails console"
 ```
+
+## Custom domain
+
+The site works on `vgoyette.fly.dev` today. Setting the Fly secret `SITE_HOST`
+switches on the custom-domain code path (host allowlist, mailer URL, and the
+`www` → apex 301). While `SITE_HOST` is unset, none of it is active. See
+personal-site-brain plan `2026-08-24-custom-domain` and [[Q-custom-domain]]
+for the rationale.
+
+Cutover checklist (operator, one-time):
+
+1. **Buy a domain** and point its nameservers at **Cloudflare** (or create the
+   zone if the domain was bought at Cloudflare Registrar). Keep the DNS
+   proxy off — **grey cloud, DNS only**. The orange-cloud proxy hides Fly's
+   IPs and breaks Let's Encrypt validation.
+
+2. **Ask Fly for certs and record targets**:
+
+   ```bash
+   fly certs add HOSTNAME --app vgoyette
+   fly certs add www.HOSTNAME --app vgoyette
+   fly certs show HOSTNAME --app vgoyette      # prints the A / AAAA to copy
+   fly certs show www.HOSTNAME --app vgoyette  # prints the CNAME to copy
+   ```
+
+3. **Add DNS records in Cloudflare** using exactly what `fly certs show`
+   printed (do not paste IPs from memory or from docs):
+
+   | Type | Name | Value | Proxy |
+   |---|---|---|---|
+   | A    | `@` (apex) | (Fly IPv4 from `fly certs show`) | DNS only |
+   | AAAA | `@` (apex) | (Fly IPv6 from `fly certs show`) | DNS only |
+   | CNAME | `www` | (hostname from `fly certs show`) | DNS only |
+
+4. **Wait for Fly to see the records** — `fly certs list --app vgoyette`
+   shows status. Certificates issue automatically once DNS resolves.
+
+5. **Activate the app** (triggers a redeploy):
+
+   ```bash
+   fly secrets set SITE_HOST=HOSTNAME --app vgoyette
+   ```
+
+6. **Verify**:
+
+   ```bash
+   curl -sI https://HOSTNAME/           # 200
+   curl -sI https://www.HOSTNAME/       # 301 -> https://HOSTNAME/
+   curl -sI https://vgoyette.fly.dev/   # 200 (still works)
+   curl -sI https://HOSTNAME/up         # 200
+   curl -sI https://HOSTNAME/admin      # 401 (Basic Auth gate)
+   ```
+
+Rollback: `fly secrets unset SITE_HOST --app vgoyette`. Everything falls back
+to `vgoyette.fly.dev`-only behavior.

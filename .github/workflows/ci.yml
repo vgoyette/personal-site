@@ -31,6 +31,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
+      # `bin/importmap audit` boots Rails via config/application, which triggers
+      # activestorage's eager load of ImageProcessing::Vips (see the test job
+      # for the same one-liner).
+      - name: Install libvips
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libvips
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -90,6 +96,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      # activestorage 8.1.3.1 eager-loads ImageProcessing::Vips on boot, so the
+      # native libvips must be present before Ruby loads Rails. The Dockerfile
+      # already installs it for prod; this mirrors that in CI.
+      - name: Install libvips
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libvips
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
